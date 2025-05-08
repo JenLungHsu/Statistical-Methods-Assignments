@@ -1,0 +1,143 @@
+---
+title: "Statistical Method HW6"
+author: "RE6121011 徐仁瓏"
+date: "2023-11-10"
+output: html_document
+---
+```{r,include=FALSE}
+#install.packages('kableExtra')
+knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+library(kableExtra)
+library(lmtest)
+```
+
+
+## **1. Using the ”Carseats” data set to answer the following questions:**
+
+### (a) Fit a multiple regression model to predict Sales using Price, Urban, and US.
+
+```{r}
+data = read.csv('/Users/xurenlong/Desktop/Statistical Methods/Assignments/HW6/Carseats.csv')
+model1 = lm(Sales ~ Price + Urban + US, data= data)
+summary(model1)
+```
+### (b) Provide an interpretation of each coefficient in the model.
+
+>#### When all independent variables are zero, the predicted value of `Sales` is 13.043469.
+>#### When `Price` increases by one unit, `Sales`, on average, decreases 0.054459 by  units. 
+>#### When `UrbanYes` increases by one unit, `Sales`, on average, decreases 0.021916 by  units.
+>#### When `USYes` increases by one unit, `Sales`, on average, increases 1.200573 by  units. 
+
+### (c) Write out the model in equation form, being careful to handle the qualitative variables properly.
+
+>#### $$Y = 13.043469 - 0.054459 \cdot X_1 - 0.021916 \cdot X_2 + 1.200573 \cdot X_3$$
+>#### Where:
+>#### $Y$ is the dependent variable `Sales`
+>#### $X_1$ is the independent variable `Price`
+>#### $X_2$ represents `Urban`, taking the value 1 for "Yes" and 0 for "No"
+>#### $X_3$ represents `US`, taking the value 1 for "Yes" and 0 for "No"
+
+### (d) For which of the predictors can you reject the null hypothesis $H_0 : β_j = 0$?
+
+> We can reject the null hypothesis for `Price` and `USYes` because the P-value of both predictors are smaller than 0.05.
+
+### (e) Based on (d), fit a smaller model that only uses the predictors for which there is evidence of association with the outcome.
+
+```{r}
+model2 = lm(Sales ~ Price + US, data= data)
+summary(model2)
+```
+### (f) How well do the models in (a) and (e) fit the data? Give the reason.
+
+```{r,echo=FALSE}
+df <- data.frame(
+  model = c(" a ", " e "),
+  `Residual standard error` = c(2.472, 2.469),
+  `Adjusted R-squared` = c(0.2335, 0.2354)
+)
+table = kable(df) %>%
+  kable_styling(full_width = TRUE) %>%
+  row_spec(0, bold = TRUE, align = 'c') %>%
+  row_spec(1:nrow(df), align='c')
+table
+
+```
+
+
+>#### When comparing two models with the same dependent variable $Y$ but different parameters, we can assess their performance by examining the Residual Standard Error (RSE) and adjusted $R^2$. 
+>#### A smaller RSE indicates better model fit, while a larger adjusted $R^2$ suggests a more favorable model. According to the table above, it is evident that **Model (e)** outperforms the other model.
+
+### (g) Try to fit a better regression model using more predictors in data set? What is the adjusted $R^2$? The analysis should provide the diagnostic figures of residuals showing the model satisfies the assumptions.
+
+```{r}
+model3 = lm(Sales ~ . , data= data)
+summary(model3)
+```
+>#### The adjusted $R^2$ is 0.8698, which is much larger than model in (a) and (e).
+>#### Therefore, this model is a better regression model.
+
+### **Residual Diagnostics**
+```{r}
+par(mfrow = c(2,2))
+plot(model3)
+```
+
+
+>#### From the first and third plots, it can be observed that there is no apparent pattern in the residuals. Therefore, it seems reasonable to assume homogeneity of variances for this dataset. 
+>#### In the second plot, although there are a few outliers, the majority of the data points are closely aligned with the reference line, indicating adherence to the normality assumption. 
+>#### The last plot indicates that there are no points exceeding Cook's distance, suggesting the absence of influential points.
+>#### Furthermore, from the plots, it is evident that there are three distinct outliers at observations 298, 357, and 358.
+
+### **Normality Assumption**
+```{r}
+shapiro.test(model3$residuals)
+```
+>#### Because the p-value is greater than 0.05, it conforms to the normality assumption.
+
+
+### **Homoscedasticity Assumption**
+```{r}
+bptest(model3)
+```
+>#### Because the p-value is greater than 0.05, it conforms to the homoscedasticity assumption.
+
+
+### **Independence Assumption**
+```{r}
+dwtest(model3)
+```
+>#### Because the p-value is greater than 0.05, it conforms to the independence assumption.
+
+
+
+---------------------------------------------------
+
+## **2. Suppose we have a data set with five predictors: **
+## $$X_1 = GPA$$ $$X_2 = IQ$$ $$X_3 = Level (1 for College and 0 for High School)$$ $$X_4 = Interaction between GPA and IQ$$ $$X_5 = Interaction between GPA and Level$$ 
+## **The response is starting salary after graduation (in thousands of dollars). Suppose we use least squares to fit the model, and get:** 
+## $$\hat{\beta}_0 = 50$$ $$\hat{\beta}_1 = 20$$ $$\hat{\beta}_2 = 0.07$$ $$\hat{\beta}_3 = 35$$ $$\hat{\beta}_4 = 0.01$$ $$\hat{\beta}_5 = -10$$
+
+### (a) True of False
+### i. For a fixed value of IQ and GPA, high school graduates earn more, on average, than college graduates.
+### ii. For a fixed value of IQ and GPA, college graduates earn more, on average, than high school graduates.
+### iii. For a fixed value of IQ and GPA, high school graduates earn more, on average, than college graduatesprovided that the GPA is high enough.
+### iv. For a fixed value of IQ and GPA, college graduates earn more, on average, than high school graduatesprovided that the GPA is high enough
+### v. Since the coefficient for the GPA/IQ interaction term is very small, there is very little evidence ofan interaction effect. Justify your answer.
+
+>#### i.  False.
+>#### ii. False.
+>#### iii.True. The proof is in the following figure.
+>#### iv. False.
+>#### v.  False. The significance of this effect cannot be determined solely by looking at the coefficient.
+
+![](/Users/xurenlong/Desktop/Statistical Methods/Assignments/HW6/note.jpg)
+
+### (b) Predict the salary of a college graduate with IQ of 110 and a GPA of 4.0.
+
+```{r}
+Salary = 50 + 20*4 + 0.07*110 + 35*1 + 0.01*4*110 - 10*4*1
+Salary
+```
+
+>#### $$ Salary = 137.1 $$

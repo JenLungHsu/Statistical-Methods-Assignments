@@ -1,0 +1,111 @@
+---
+title: "Statistical Method HW1"
+author: "徐仁瓏 RE6121011"
+date: "2023-09-12"
+output: html_document
+---
+
+```{r}
+data("iris")
+dat = iris
+head(dat)
+```
+
+
+## 1. What are the types of variables?
+
+`Sepal.Length` : cardinal
+
+`Sepal.Width`  : cardinal
+
+`Petal.Length` : cardinal
+
+`Petal.Width`  : cardinal
+
+`Species`      :  nominal
+
+
+## 2. For each variables, give the histogram/barplot and boxplot.
+
+
+> Sepal.Length
+
+
+```{r, echo=FALSE}
+par(mfrow=c(1,2))
+hist(dat$Sepal.Length, xlab='Sepal.Length', main='Histogram')
+boxplot(dat$Sepal.Length, xlab='Sepal.Length', main='Boxplot')
+```
+
+
+> Sepal.Width
+
+```{r, echo=FALSE}
+par(mfrow=c(1,2))
+hist(dat$Sepal.Width, xlab='Sepal.Width', main='Histogram')
+boxplot(dat$Sepal.Width, xlab='Sepal.Width', main='Boxplot')
+```
+
+> Petal.Length
+
+```{r, echo=FALSE}
+par(mfrow=c(1,2))
+hist(dat$Petal.Length, xlab='Petal.Length', main='Histogram')
+boxplot(dat$Petal.Length, xlab='Petal.Length', main='Boxplot')
+```
+
+> Petal.Width
+
+```{r, echo=FALSE}
+par(mfrow=c(1,2))
+hist(dat$Petal.Width, xlab='Petal.Width', main='Histogram')
+boxplot(dat$Petal.Width, xlab='Petal.Width', main='Boxplot')
+```
+
+> Species
+
+```{r, echo=FALSE}
+barplot(table(dat$Species) ,main='Bar Chart') 
+```
+
+
+
+
+
+## 3. Use a table to summarize variables with the descriptive statistics including mean, median, variance, standard deviation, range, IQR, skewness, and kurtosis.
+
+```{r , echo=FALSE}
+library(moments)
+
+df = data.frame(
+  Variables = c('Sepal.Length', 'Sepal.Width', 'Petal.Length', 'Petal.Width') , 
+  Mean = c(mean(dat$Sepal.Length), mean(dat$Sepal.Width), mean(dat$Petal.Length), mean(dat$Petal.Width)) , 
+  Median = c(median(dat$Sepal.Length), median(dat$Sepal.Width), median(dat$Petal.Length), median(dat$Petal.Width)) , 
+  Variance = c(var(dat$Sepal.Length), var(dat$Sepal.Width), var(dat$Petal.Length), var(dat$Petal.Width)) , 
+  SD = c(sd(dat$Sepal.Length), sd(dat$Sepal.Width), sd(dat$Petal.Length), sd(dat$Petal.Width)) , 
+  Range = c(max(dat$Sepal.Length)-min(dat$Sepal.Length), max(dat$Sepal.Width)-min(dat$Sepal.Width), max(dat$Petal.Length)-min(dat$Petal.Length), max(dat$Petal.Width)- min(dat$Petal.Width)) , 
+  IQR = c(as.numeric(quantile(dat$Sepal.Length,3/4)-quantile(dat$Sepal.Length,1/4)),
+          as.numeric(quantile(dat$Sepal.Width,3/4)-quantile(dat$Sepal.Width,1/4)),
+          as.numeric(quantile(dat$Petal.Length,3/4)-quantile(dat$Petal.Length,1/4)),
+          as.numeric(quantile(dat$Petal.Width,3/4)-quantile(dat$Petal.Width,1/4))) ,
+  Skewness = c(skewness(dat$Sepal.Length), skewness(dat$Sepal.Width), skewness(dat$Petal.Length), skewness(dat$Petal.Width)) , 
+  Kurtosis = c(kurtosis(dat$Sepal.Length), kurtosis(dat$Sepal.Width), kurtosis(dat$Petal.Length), kurtosis(dat$Petal.Width))
+)
+```
+```{r results = 'asis' ,echo=FALSE}
+knitr::kable(df, caption = 'Table with IRIS data')
+```
+
+## 4. Are all cardinal variables symmetric?
+
+> According to the histogram & boxplot above, we can easily see that `Petal.Length` & `Petal.Width` are NOT symmetric. 
+
+> However, the histogram of `Sepal.Length` & `Sepal.Width` seem to look like Normal distribution, but when we take a look at its boxplot very carefully, we can see that `Sepal.Length` & `Sepal.Width` are NOT symmetric either.
+
+## 5. Is there any outlier?
+
+> According to the boxplot above, we can see that there are NO outliers in the variables `Sepal.Length`, `Petal.Length`, `Petal.Width`. 
+
+> However, there are 4 outliers in the variable `Sepal.Width`.
+
+

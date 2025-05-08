@@ -1,0 +1,76 @@
+---
+title: "Statistical Method HW5"
+author: "RE6121011 徐仁瓏"
+date: "2023-10-31"
+output: html_document
+---
+
+
+## Given the sepal width of ”iris” data, use the following steps to show if the mean of sepal width is 3. Assume the sepal widths are random samples from a normal distribution
+
+```{r}
+data(iris)
+x = iris$Sepal.Width
+```
+
+## (a) Use the maximum likelihood estimation method to estimate the model parameters of the normal distribution. 
+
+```{r}
+set.seed(6121)
+likelihood.normal = function(par, data){
+  mu = par[1]
+  sig = par[2]
+  joint = dnorm(data, mean = mu, sd = sig)
+  return(-sum(log(joint)))}
+
+opt = optim(c(3,0.1), likelihood.normal, data = x)
+
+mu.hat.mle = opt$par[1]
+sig.hat.mle = opt$par[2]
+```
+
+```{r}
+mu.hat.mle
+sig.hat.mle
+```
+
+>#### $\hat{\mu}_{MLE} = 3.057459$  , $\hat{\sigma}_{MLE} =  0.4344073$
+
+## (b) According to the question ”if the mean of sepal width is 3”, what is the estimate for the quantity of interest?
+
+>#### We can use $\hat{\mu}_{MLE}$ to estimate $\mu$ , which is the mean of sepal width.
+
+## (c) Construct the 95% confidence interval for the true quantity of interest by bootstrapping.
+
+```{r}
+set.seed(6121)
+iter = 1000
+np.mu.hat = rep(NA,iter)
+np.sig.hat = rep(NA,iter)
+
+for (j in 1:iter){
+  dataY = sample(x, length(x), replace = TRUE)
+  estY = optim(c(3,0.2), likelihood.normal, data = dataY)
+  np.mu.hat[j] = estY$par[1]
+  np.sig.hat[j] = estY$par[2]
+}
+```
+
+```{r}
+quantile(np.mu.hat, c(0.025, 0.975))
+quantile(np.sig.hat, c(0.025, 0.975))
+```
+
+>#### The 95% C.I. for the true quantity of interest by bootstrapping is [2.992, 3.127]
+
+## (d) Based on the 95% confidence interval in (c), how would you conclude the question ”if the mean of sepal width is 3”?
+
+>#### We can say that "the mean of sepal width is 3" because 3 is in the interval [2.992, 3.127].
+
+## (e) If I use a one-sample t-test to test if $H_{0} : \mu = 3$, is the conclusion as the same as the result in (d)?
+
+```{r}
+t.test(x, alternative = 'two.sided', mu = 3)
+```
+
+>#### The P-value > 0.05, so we do not reject the $H_{0}$. Therefore, we don't have sufficient evidance to claim that "the mean of sepal width is not 3", so the conclusion is as the same as the result in (d).
